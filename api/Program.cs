@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Threading.RateLimiting;
+using System.Security.Claims;
 using Microsoft.AspNetCore.RateLimiting;
 
 
@@ -84,32 +85,44 @@ builder.Services
           ValidateLifetime = true,
           ClockSkew = TimeSpan.Zero
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async contexto =>
+            {
+                var valor = contexto.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if(!int.TryParse(valor, out var usuarioId))
+                {
+                    contexto.Fail("Token sem identificação de usuário.");
+                    return;
+                }
+
+                var usuarios = contexto.HttpContext.RequestServices.GetRequiredService<IUsuarioRepository>();
+
+                if(!await usuarios.EstaAtivoAsync(usuarioId))
+                    contexto.Fail("Usuário inativo ou inexistente");
+            }
+        };
     });
 
 builder.Services.AddRateLimiter(opcoes =>
 {
-    var limiteLogin = builder.Configuration.GetValue("RateLimitng:Login:Limite",10);
-
    opcoes.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
    opcoes.AddPolicy("login", contexto =>
    {
-       var ambiente = contexto.RequestServices.GetRequiredService<IWebHostEnvironment>();
-
-       if(ambiente.IsEnvironment("Testing"))
-            return RateLimitPartition.GetNoLimiter("testes");
+        var configuracao = contexto.RequestServices.GetRequiredService<IConfiguration>();
+        var limite = configuracao.GetValue("RateLimiting:Login:Limite", 10);
 
         return RateLimitPartition.GetFixedWindowLimiter(contexto.Connection.RemoteIpAddress?.ToString()
             ?? "desconhecido", _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,
+                PermitLimit = limite,
                 Window = TimeSpan.FromMinutes(1)
             });
    });
 });
-
-builder.Services.AddControllers();
-builder.Services.AddControllers().AddRespostaDeValidacao();
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -171,12 +184,6 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}
 
 app.Run();
 

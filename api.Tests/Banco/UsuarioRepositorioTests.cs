@@ -249,5 +249,22 @@ namespace api.Tests.Banco
 
             Assert.Equal(PerfilUsuario.Admin, alterado!.Perfil);
         }
+
+        [Fact]
+        public async Task EstaAtivo_VerdadeiroSoParaUsuarioAtivo()
+        {
+            await using var contexto = await _fixture.CriarBancoLimpoAsync();
+            var ativo = await SalvarAsync(contexto, DadosDeTeste.NovoUsuario());
+            var inativo = DadosDeTeste.NovoUsuario("bia@gmail.com", "11144477735");
+            inativo.Ativo = false;
+            await SalvarAsync(contexto, inativo);
+
+            await using var consulta = _fixture.NovoContextoDoMesmoBanco(contexto);
+            var repo = new UsuarioRepository(consulta);
+
+            Assert.True(await repo.EstaAtivoAsync(ativo.Id));
+            Assert.False(await repo.EstaAtivoAsync(inativo.Id));
+            Assert.False(await repo.EstaAtivoAsync(9999));
+        }
     }
 }

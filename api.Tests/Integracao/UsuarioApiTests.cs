@@ -268,5 +268,30 @@ namespace api.Tests.Integracao
             await AssertStatusAsync(HttpStatusCode.NoContent, await admin.DeleteAsync($"/api/usuarios/{idSemPedido}"));
             await AssertStatusAsync(HttpStatusCode.NotFound, await admin.GetAsync($"/api/usuarios/{idSemPedido}"));
         }
+
+        [Fact]
+        public async Task UsuarioQueSeDesativa_TokenAntigoPassaASerRejeitado()
+        {
+            var cliente = await NovoClienteLogadoAsync();
+            await AssertStatusAsync(HttpStatusCode.OK, await cliente.GetAsync("/api/usuarios/me"));
+
+            await AssertStatusAsync(HttpStatusCode.NoContent, await cliente.PatchAsync("/api/usuarios/me/desativar", CorpoVazio()));
+
+            await AssertStatusAsync(HttpStatusCode.Unauthorized, await cliente.GetAsync("/api/usuarios/me"));
+            await AssertStatusAsync(HttpStatusCode.Unauthorized, await cliente.GetAsync("/api/enderecos"));
+        }
+
+        [Fact]
+        public async Task AdminDesativaUsuario_ATokenDoDesativadoPassaASerRejeitada()
+        {
+            var (email, senha) = await CadastrarClienteAsync();
+            var alvo = await LogarAsync(email, senha);
+            var alvoId = await ObterMeuIdAsync(alvo);
+            var admin = await LogarComoAdminAsync();
+
+            await AssertStatusAsync(HttpStatusCode.NoContent, await admin.PatchAsync($"/api/usuarios/{alvoId}/desativar", CorpoVazio()));
+
+            await AssertStatusAsync(HttpStatusCode.Unauthorized, await alvo.GetAsync("/api/usuarios/me"));
+        }
     }
 }

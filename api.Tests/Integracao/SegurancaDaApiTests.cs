@@ -154,6 +154,20 @@ namespace api.Tests.Integracao
             Assert.Equal(HttpStatusCode.Unauthorized, resposta.StatusCode);
         }
 
+        [Fact]
+        public async Task Login_AcimaDoLimitePorMinuto_Retorna429_EOutrasRotasContinuamLivres()
+        {
+            await using var fabrica = Fixture.CriarFabricaComLimiteDeLogin(3);
+            var cliente = fabrica.CreateClient();
+            var tentativa = new LoginDto { Email = "nao.existe@teste.com", Senha = "SenhaErrada111" };
+
+            for (var i = 0; i < 3; i++)
+                await AssertStatusAsync(HttpStatusCode.Unauthorized, await cliente.PostAsJsonAsync("/api/auth/login", tentativa));
+
+            await AssertStatusAsync(HttpStatusCode.TooManyRequests, await cliente.PostAsJsonAsync("/api/auth/login", tentativa));
+            await AssertStatusAsync(HttpStatusCode.OK, await cliente.GetAsync("/api/livros"));
+        }
+
         private static async Task<string?> LerDetalheAsync(HttpResponseMessage resposta)
         {
             using var documento = JsonDocument.Parse(await resposta.Content.ReadAsStringAsync());

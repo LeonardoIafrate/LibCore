@@ -16,6 +16,7 @@ namespace api.Interfaces
         Task<Usuario?> AlterarUsuarioAdminAsync(int id);
         Task<Usuario?> DeleteAsync(int id);
         Task<Usuario?> DesativarAsync(int id);
+        Task<bool> EstaAtivoAsync(int id);
         Task<bool> PossuiPedidosAsync(int id);
         Task<bool> ExistsAsync(int id);
     }

@@ -28,5 +28,13 @@ namespace api.Tests.Services
 
             Assert.Equal("52998224725", resultado);
         }
+
+        [Theory]
+        [InlineData("52998224725")]
+        [InlineData("529.982.247-25")]
+        public void CpfDeReferencia_EhAceito(string cpf)
+        {
+            Assert.True(CpfHellper.EhValido(cpf));
+        }
     }
 }

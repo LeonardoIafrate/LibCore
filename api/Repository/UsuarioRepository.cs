@@ -135,5 +135,10 @@ namespace api.Repository
         {
             return await _dbContext.Pedido.AnyAsync(p => p.UsuarioId == id);
         }
+
+        public async Task<bool> EstaAtivoAsync(int id)
+        {
+            return await _dbContext.Usuario.AnyAsync(u => u.Id == id && u.Ativo);
+        }
     }
 }

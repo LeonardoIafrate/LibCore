@@ -34,7 +34,7 @@ namespace api.Data
 
             await _contexto.Database.MigrateAsync();
 
-            var nome = GetRequired("BootstrapAdmin:Name").Trim().ToLowerInvariant();
+            var nome = GetRequired("BootstrapAdmin:Name").Trim();
             var email = GetRequired("BootstrapAdmin:Email").Trim().ToLowerInvariant();
             var senha = GetRequired("BootstrapAdmin:Password");
             var cpf = CpfHellper.SomenteDigitos(GetRequired("BootstrapAdmin:Cpf"));
@@ -57,17 +57,9 @@ namespace api.Data
 
                 if(enderecos.Count == 0)
                 {
-                    var novoEndereco = CriarEnderecoInicial();
-                    
-                    usuarioExistente.Enderecos.Add(novoEndereco);
-                    await _enderecoRepo.DefinirPrincipalAsync(novoEndereco.Id);
+                    usuarioExistente.Enderecos.Add(CriarEnderecoInicial());
                     await _contexto.SaveChangesAsync();
-
-                    return;
                 }
-
-
-                await _contexto.SaveChangesAsync();
                 
                 return;
             }          
@@ -107,6 +99,7 @@ namespace api.Data
                 Cidade = "São Paulo",
                 Uf = "SP",
 
+                Principal = true,
                 Ativo = true
             };
         }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.MsSql;
@@ -30,6 +31,14 @@ namespace api.Tests.Integracao
             var opcoes = new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(_conexao).Options;
             return new AppDbContext(opcoes);
         }
+
+        public WebApplicationFactory<Program> CriarFabricaComLimiteDeLogin(int limite) =>
+        _fabrica!.WithWebHostBuilder(construtor =>
+            construtor.ConfigureAppConfiguration((_, configuracao) =>
+                configuracao.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["RateLimiting:Login:Limite"] = limite.ToString()
+                })));
 
         public async Task<int> CriarLivroAsync(decimal preco = 30m, int estoque = 10)
         {
@@ -69,9 +78,10 @@ namespace api.Tests.Integracao
 
             _conexao = conexao;
 
-            Environment.SetEnvironmentVariable("ConnectionString__DefaulConnection", conexao);
+            Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", conexao);
             Environment.SetEnvironmentVariable("Jwt__Chave", "chave-somente-para-testes-com-mais-de-32-caracteres");
-            Environment.SetEnvironmentVariable("Loggin__LogLevel__Default", "Warning");
+            Environment.SetEnvironmentVariable("Logging__LogLevel__Default", "Warning");
+            Environment.SetEnvironmentVariable("RateLimiting__Login__Limite", "100000");
 
             var opcoes = new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(conexao).Options;
 

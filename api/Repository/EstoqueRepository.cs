@@ -40,6 +40,7 @@ namespace api.Repository
             var termo = nomeLivro.Trim();
 
             return await _dbContext.Estoque
+                    .Include(e => e.Livro)
                     .AsNoTracking()
                     .Where(e => e.Livro.Nome.Contains(termo))
                     .OrderBy(e => e.Livro.Nome)
@@ -53,6 +54,7 @@ namespace api.Repository
                 return null;
 
             estoqueExistente.Quantidade = estoqueModel.Quantidade;
+            estoqueExistente.DataAtualizacao = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
 
             return estoqueExistente;

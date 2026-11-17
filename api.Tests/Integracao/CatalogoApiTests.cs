@@ -395,5 +395,16 @@ namespace api.Tests.Integracao
 
             await AssertStatusAsync(HttpStatusCode.NotFound, resposta);
         }
+
+        [Fact]
+        public async Task Estoque_BuscaPeloNomeDoLivro_NaoQuebra()
+        {
+            var admin = await LogarComoAdminAsync();
+            await Fixture.CriarLivroAsync(estoque: 4);
+
+            var resposta = await admin.GetAsync("/api/estoques?nomeLivro=Livro");
+
+            await AssertStatusAsync(HttpStatusCode.OK, resposta);
+        }
     }
 }
