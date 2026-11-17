@@ -16,6 +16,8 @@ using Microsoft.OpenApi;
 using System.Threading.RateLimiting;
 using System.Security.Claims;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using api.HealthChecks;
 
 
 
@@ -57,6 +59,14 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton(TimeProvider.System);
+
+var origensPermitidas = builder.Configuration.GetSection("Cors:Origens").Get<string[]>() ?? Array.Empty<string>();  
+
+builder.Services.AddCors(opcoes => 
+    opcoes.AddPolicy("Frontend", politica => politica
+        .WithOrigins(origensPermitidas)
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
 
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();
 
@@ -143,6 +153,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddHealthChecks().AddCheck<BancoHealthCheck>("banco", tags: new[] { "ready" });
+
 var app = builder.Build();
 
 if (!app.Environment.IsEnvironment("Testing"))
@@ -164,6 +176,9 @@ if (!app.Environment.IsEnvironment("Testing"))
     }
 }
 
+app.UseCors("Frontend");
+app.UseExceptionHandler();
+
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -184,6 +199,9 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions {Predicate = _ =>false});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions {Predicate = check => check.Tags.Contains("ready")});
 
 app.Run();
 

@@ -82,6 +82,7 @@ namespace api.Tests.Integracao
             Environment.SetEnvironmentVariable("Jwt__Chave", "chave-somente-para-testes-com-mais-de-32-caracteres");
             Environment.SetEnvironmentVariable("Logging__LogLevel__Default", "Warning");
             Environment.SetEnvironmentVariable("RateLimiting__Login__Limite", "100000");
+            Environment.SetEnvironmentVariable("Cors__Origens__0", "http://localhost:5173");
 
             var opcoes = new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(conexao).Options;
 
