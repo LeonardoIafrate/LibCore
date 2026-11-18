@@ -21,13 +21,10 @@ namespace api.Services
             _tempo = tempo;
         }
 
-        public async Task<List<UsuarioDto>> GetAllAsync(string? nome)
+        public async Task<PagedResult<UsuarioDto>> GetAllAsync(UsuarioQueryObject query)
         {
-            var usuarios = string.IsNullOrWhiteSpace(nome) 
-                ? await _usuarioRepo.GetAllAsync() 
-                : await _usuarioRepo.SearchByNomeAsync(nome);
-
-            return usuarios.Select(u => u.ToUsuarioDto()).ToList();
+            var usuario = await _usuarioRepo.GetAllAsync(query);
+            return usuario.Map(u => u.ToUsuarioDto());
         }
 
         public async Task<UsuarioDto> GetByIdAsync(int id)

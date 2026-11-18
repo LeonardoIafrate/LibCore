@@ -1,13 +1,13 @@
+using api.Helpers;
 using api.Models;
 
 namespace api.Interfaces
 {
     public interface IPedidoRepository
     {
-        Task<List<Pedido>> GetAllAsync();
+        Task<PagedResult<Pedido>> GetAllAsync(PedidoQueryObject query);
         Task<Pedido?> GetByIdAsync(int id);
         Task<List<Pedido>> GetByIdUsuarioAsync(int usuarioId);
-        Task<List<Pedido>> GetByNomeUsuarioAsync(string nomeUsuario);
         Task<Pedido> CreatePedidoAsync(Pedido pedidoModel);
         Task<Pedido?> UpdateEnderecoPedidoAsync(int id, EnderecoEntrega novoEndereco);
         Task<Pedido?> AtualizarStatusAsync(int id, StatusPedido status);

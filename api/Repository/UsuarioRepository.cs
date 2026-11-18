@@ -1,4 +1,5 @@
 using api.Data;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,20 @@ namespace api.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<List<Usuario>> GetAllAsync()
+        public async Task<PagedResult<Usuario>> GetAllAsync(UsuarioQueryObject query)
         {
-            return await _dbContext.Usuario
-                        .AsNoTracking()
-                        .OrderBy(u => u.Nome)
-                        .ToListAsync();
+            var usuarios = _dbContext.Usuario.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Nome))
+            {
+                var termo = query.Nome.Trim();
+                usuarios = usuarios.Where(u => u.Nome.Contains(termo));
+            }
+
+            return await usuarios
+                .OrderBy(u => u.Nome)
+                .ThenBy(u => u.Id)
+                .ToPagedResultAsync(query.Pagina, query.TamanhoPagina);
         }
 
         public async Task<Usuario?> GetByIdAsync(int id)
@@ -35,14 +44,6 @@ namespace api.Repository
             return await _dbContext.Usuario.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<List<Usuario>> SearchByNomeAsync(string nome)
-        {
-            var termo = nome.Trim();
-            return await _dbContext.Usuario
-                        .AsNoTracking()
-                        .Where(u => u.Nome.Contains(termo))
-                        .ToListAsync();
-        }
 
         public async Task<Usuario> CreateAsync(Usuario usuarioModel)
         {

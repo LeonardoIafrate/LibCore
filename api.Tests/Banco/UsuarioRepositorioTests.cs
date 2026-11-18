@@ -1,4 +1,5 @@
 using api.Data;
+using api.Helpers;
 using api.Models;
 using api.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -143,33 +144,27 @@ namespace api.Tests.Banco
         }
 
         [Fact]
-        public async Task SearchByNome_BuscaPorParteDoNomeSemDiferenciarMaiusculas()
-        {
-            await using var contexto = await _fixture.CriarBancoLimpoAsync();
-            await SalvarAsync(contexto, DadosDeTeste.NovoUsuario());
-            var outro = DadosDeTeste.NovoUsuario("bia@gmail.com", "11144477735");
-            outro.Nome = "Bia Lima";
-            await SalvarAsync(contexto, outro);
-
-            await using var consulta = _fixture.NovoContextoDoMesmoBanco(contexto);
-            var resultado = await new UsuarioRepository(consulta).SearchByNomeAsync("souza");
-
-            Assert.Equal("Ana Souza", Assert.Single(resultado).Nome);
-        }
-
-        [Fact]
-        public async Task GetAll_OrdenaPeloNome()
+        public async Task GetAll_OrdenaPeloNome_Pagina_EFiltraPorParteDoNome()
         {
             await using var contexto = await _fixture.CriarBancoLimpoAsync();
             var zeca = DadosDeTeste.NovoUsuario("zeca@gmail.com", "11144477735");
             zeca.Nome = "Zeca";
+            var bia = DadosDeTeste.NovoUsuario("bia@gmail.com", "58310472617");
+            bia.Nome = "Bia";
             await SalvarAsync(contexto, zeca);
+            await SalvarAsync(contexto, bia);
             await SalvarAsync(contexto, DadosDeTeste.NovoUsuario());
 
             await using var consulta = _fixture.NovoContextoDoMesmoBanco(contexto);
-            var resultado = await new UsuarioRepository(consulta).GetAllAsync();
+            var repo = new UsuarioRepository(consulta);
 
-            Assert.Equal(new[] { "Ana Souza", "Zeca" }, resultado.Select(u => u.Nome));
+            var primeiraPagina = await repo.GetAllAsync(new UsuarioQueryObject {Pagina = 1, TamanhoPagina = 2});
+            Assert.Equal(3, primeiraPagina.Total);
+            Assert.Equal(2, primeiraPagina.TotalPaginas);
+            Assert.Equal(new[] { "Ana Souza", "Bia" }, primeiraPagina.Itens.Select(u => u.Nome));
+
+            var filtrado = await repo.GetAllAsync(new UsuarioQueryObject { Nome = "souza" });
+            Assert.Equal("Ana Souza", Assert.Single(filtrado.Itens).Nome);
         }
 
         [Fact]

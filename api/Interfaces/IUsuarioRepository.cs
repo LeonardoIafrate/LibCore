@@ -1,14 +1,14 @@
+using api.Helpers;
 using api.Models;
 
 namespace api.Interfaces
 {
     public interface IUsuarioRepository
     {
-        Task<List<Usuario>> GetAllAsync();
+        Task<PagedResult<Usuario>> GetAllAsync(UsuarioQueryObject query);
         Task<Usuario?> GetByIdAsync(int id);
         Task<Usuario?> GetByEmailAsync(string email);
         Task<Usuario?> GetByCpfAsync(string cpf);
-        Task<List<Usuario>> SearchByNomeAsync(string nome);
         Task<Usuario> CreateAsync(Usuario usuarioModel);
         Task<Usuario?> UpdateAsync(int id, Usuario usuarioModel);
         Task<bool> UpdateSenhaAsync(int id, string senhaHash);

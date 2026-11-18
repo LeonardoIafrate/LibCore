@@ -1,4 +1,5 @@
 using api.Data;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,14 +15,28 @@ namespace api.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<List<Pedido>> GetAllAsync()
+        public async Task<PagedResult<Pedido>> GetAllAsync(PedidoQueryObject query)
         {
-            return await _dbContext.Pedido.AsNoTracking()
-                            .Include(p => p.Usuario)
-                            .Include(p => p.Itens)
-                                .ThenInclude(i => i.Livro)
-                            .OrderByDescending(p => p.DataPedido)
-                            .ToListAsync();
+            var pedidos = _dbContext.Pedido
+                .AsNoTracking()
+                .Include(p => p.Usuario)
+                .Include(p => p.Itens)
+                    .ThenInclude(i => i.Livro)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Nome))
+            {
+                var nome = query.Nome.Trim();
+                pedidos = pedidos.Where(p => p.Usuario.Nome.Contains(nome));
+            }
+
+            if (query.Status.HasValue)
+                pedidos = pedidos.Where(p => p.Status == query.Status.Value);
+
+            return await pedidos
+                .OrderByDescending(p => p.DataPedido)
+                .ThenByDescending(p => p.Id)
+                .ToPagedResultAsync(query.Pagina, query.TamanhoPagina);
         }
 
         public async Task<Pedido?> GetByIdAsync(int id)
@@ -38,20 +53,6 @@ namespace api.Repository
             return await _dbContext.Pedido
                             .AsNoTracking()
                             .Where(p => p.UsuarioId == usuarioId)
-                            .Include(p => p.Usuario)
-                            .Include(p => p.Itens)
-                                .ThenInclude(i => i.Livro)
-                            .OrderByDescending(p => p.DataPedido)
-                            .ToListAsync();
-        }
-
-        public async Task<List<Pedido>> GetByNomeUsuarioAsync(string nomeUsuario)
-        {
-            var nome = nomeUsuario.Trim();
-
-            return await _dbContext.Pedido
-                            .AsNoTracking()
-                            .Where(p => p.Usuario.Nome.Contains(nome))
                             .Include(p => p.Usuario)
                             .Include(p => p.Itens)
                                 .ThenInclude(i => i.Livro)

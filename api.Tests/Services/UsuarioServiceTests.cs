@@ -361,24 +361,16 @@ public class UsuarioServiceTests
     }
 
     [Fact]
-    public async Task GetAll_SemNome_ListaTodos()
+    public async Task GetAll_DevolveAPaginacaoDoRepositorioConvertidoEmDto()
     {
-        _usuarioRepo.GetAllAsync().Returns(new List<Usuario> { CriarUsuario() });
+        var query = new UsuarioQueryObject { Nome = "ana"};
+        _usuarioRepo.GetAllAsync(query)
+            .Returns(new PagedResult<Usuario>(new List<Usuario> { CriarUsuario()}, 1, 1 ,10));
 
-        var resultado = await CriarServico().GetAllAsync(null);
+        var resultado = await CriarServico().GetAllAsync(query);
 
-        Assert.Single(resultado);
-        await _usuarioRepo.DidNotReceive().SearchByNomeAsync(Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task GetAll_BuscaSemResultado_DevolveListaVaziaEmVezDeErro()
-    {
-        _usuarioRepo.SearchByNomeAsync("zzz").Returns(new List<Usuario>());
-
-        var resultado = await CriarServico().GetAllAsync("zzz");
-
-        Assert.Empty(resultado);
+        Assert.Single(resultado.Itens);
+        Assert.Equal(1, resultado.Total);
     }
 
     [Fact]

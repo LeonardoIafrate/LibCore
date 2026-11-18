@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using api.Dtos.Endereco;
 using api.Dtos.Pedido;
 using Xunit;
@@ -9,6 +10,18 @@ namespace api.Tests.Integracao
     [Collection("Api")]
     public class PedidosApiTests : ApiTestBase
     {
+        private static async Task<(int Total, int TotalPaginas, List<int> Ids)> LerPaginaAsync(HttpClient admin, string rota)
+        {
+            var resposta = await admin.GetAsync(rota);
+            await GarantirSucessoAsync(resposta);
+
+            using var documento = JsonDocument.Parse(await resposta.Content.ReadAsStringAsync());
+            var raiz = documento.RootElement;
+            var ids = raiz.GetProperty("itens").EnumerateArray().Select(i => i.GetProperty("id").GetInt32()).ToList();
+
+            return (raiz.GetProperty("total").GetInt32(), raiz.GetProperty("totalPaginas").GetInt32(), ids);
+        }
+
         public PedidosApiTests(ApiFixture fixture): base(fixture)
         {
         }
@@ -176,6 +189,49 @@ namespace api.Tests.Integracao
             var resposta = await admin.GetAsync($"/api/pedidos/{pedido.Id}");
 
             Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        }
+
+        [Fact]
+        public async Task Administrador_ListaPedidosPaginada_RespeitaOTamanho_ENaoRepeteItens()
+        {
+            var livroId = await Fixture.CriarLivroAsync(estoque: 10);
+            var cliente = await NovoClienteLogadoAsync();
+            for (var i = 0; i < 3; i++)
+                await ComprarAsync(cliente, livroId, 1);
+            var admin = await LogarComoAdminAsync();
+
+            var pagina1 = await LerPaginaAsync(admin, "/api/pedidos?pagina=1&tamanhoPagina=2");
+            var pagina2 = await LerPaginaAsync(admin, "/api/pedidos?pagina=2&tamanhoPagina=2");
+
+            Assert.Equal(2, pagina1.Ids.Count);
+            Assert.True(pagina1.Total >= 3);
+            Assert.True(pagina1.TotalPaginas >= 2);
+            Assert.Empty(pagina1.Ids.Intersect(pagina2.Ids));
+        }
+
+        [Theory]
+        [InlineData("pagina=0")]
+        [InlineData("pagina=-5")]
+        [InlineData("tamanhoPagina=0")]
+        [InlineData("tamanhoPagina=51")]
+        [InlineData("tamanhoPagina=100000")]
+        public async Task Admin_ListaPedidos_ComParametrosDePaginaInvalidos_Retorna400(string consulta)
+        {
+            var admin = await LogarComoAdminAsync();
+
+            var resposta = await admin.GetAsync($"/api/pedidos?{consulta}");
+
+            await AssertStatusAsync(HttpStatusCode.BadRequest, resposta);
+        }
+
+        [Fact]
+        public async Task Admin_ListaPedidos_ComOTamanhoMaximoPermitido_Retorna200()
+        {
+            var admin = await LogarComoAdminAsync();
+
+            var resposta = await admin.GetAsync("/api/pedidos?pagina=1&tamanhoPagina=50");
+
+            await AssertStatusAsync(HttpStatusCode.OK, resposta);
         }
 
         [Fact]

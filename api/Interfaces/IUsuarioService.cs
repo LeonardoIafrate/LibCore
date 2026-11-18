@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Dtos.Usuario;
+using api.Helpers;
 
 namespace api.Interfaces
 {
     public interface IUsuarioService
     {
-        Task<List<UsuarioDto>> GetAllAsync(string? nome);
+        Task<PagedResult<UsuarioDto>> GetAllAsync(UsuarioQueryObject query);
         Task<UsuarioDto> GetByIdAsync(int id);
         Task<UsuarioDto> GetByEmailAsync(string email);
         Task<UsuarioDto> GetByCpfAsync(string cpf);

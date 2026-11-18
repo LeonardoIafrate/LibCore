@@ -1,5 +1,6 @@
 using api.Dtos.Pedido;
 using api.Exceptions;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -27,12 +28,10 @@ namespace api.Services
             _enderecoRepo = enderecoRepo;
             _livroRepo = livroRepo;
         }
-        public async Task<List<PedidoDto>> GetAllAsync(string? nomeUsuario)
+        public async Task<PagedResult<PedidoDto>> GetAllAsync(PedidoQueryObject query)
         {
-            var pedidos = string.IsNullOrWhiteSpace(nomeUsuario)
-                ? await _pedidoRepo.GetAllAsync()
-                : await _pedidoRepo.GetByNomeUsuarioAsync(nomeUsuario);
-            return pedidos.Select(p => p.ToPedidoDto()).ToList();
+            var pedidos = await _pedidoRepo.GetAllAsync(query);
+            return pedidos.Map(p => p.ToPedidoDto());
         }
 
         public async Task<List<PedidoDto>> GetByUsuarioIdAsync(int usuarioId)

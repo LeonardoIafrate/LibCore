@@ -15,7 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Threading.RateLimiting;
 using System.Security.Claims;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using api.HealthChecks;
 

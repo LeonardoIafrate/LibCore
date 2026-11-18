@@ -73,9 +73,9 @@ namespace api.Controllers
 
         [Authorize(Roles = nameof(PerfilUsuario.Admin))]
         [HttpGet]
-        public async Task<ActionResult<List<UsuarioDto>>> GetAll([FromQuery]string? nome)
+        public async Task<ActionResult<PagedResult<UsuarioDto>>> GetAll([FromQuery]UsuarioQueryObject query)
         {
-            var usuarios = await _usuarioService.GetAllAsync(nome);
+            var usuarios = await _usuarioService.GetAllAsync(query);
             return Ok(usuarios);
         }
 

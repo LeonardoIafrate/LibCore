@@ -56,9 +56,9 @@ namespace api.Controllers
 
         [Authorize(Roles = nameof(PerfilUsuario.Admin))]
         [HttpGet]
-        public async Task<ActionResult<List<PedidoDto>>> GetAll([FromQuery] string? nome)
+        public async Task<ActionResult<PagedResult<PedidoDto>>> GetAll([FromQuery] PedidoQueryObject query)
         {
-            var pedidos = await _pedidoService.GetAllAsync(nome);
+            var pedidos = await _pedidoService.GetAllAsync(query);
             return Ok(pedidos);
         }
 

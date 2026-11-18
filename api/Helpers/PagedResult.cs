@@ -16,7 +16,6 @@ namespace api.Helpers
             TamanhoPagina = tamanhoPagina;
         }
 
-        // Converte os itens (por exemplo, de entidade para DTO) mantendo os dados de paginação
         public PagedResult<TOut> Map<TOut>(Func<T, TOut> converter)
         {
             return new PagedResult<TOut>(
