@@ -1,5 +1,8 @@
 import type { StatusPedido } from './api/types'
 
+/** Abaixo disso o estoque aparece para o cliente ("restam poucas unidades"). */
+export const ESTOQUE_BAIXO = 50
+
 export const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 export const dataBr = (iso: string) => new Date(iso).toLocaleDateString('pt-BR')
 export const dataHoraBr = (iso: string) => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })

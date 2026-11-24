@@ -2,7 +2,7 @@
   /* paleta: #000000 #7890A8 #304878 #181848 + destaque âmbar */
   --bg: #000000; --paper: #181848; --ink: #e8edf4; --muted: #8ea3ba; --line: #304878;
   --green: #9db8d6; --terra: #f0a818; --gold: #f0a818; --amarelo: #f0a818; --ok: #5fc08a; --danger: #a31c08;
-  --btn: #304878; --btn-d: #3f5c96; --surface-2: #232a66; --th-bg: #121240; --sel: #202a64; --input-bg: #0d0d2e;
+  --btn: #304878; --btn-d: #3f5c96; --surface-2: #232a66; --chip-bg: #232a66; --th-bg: #121240; --sel: #202a64; --input-bg: #0d0d2e;
   --alert-bg: #3a1f2b; --alert-line: #7a3345; --overlay: rgba(0,0,0,.72); --shadow: rgba(0,0,0,.6);
   --b-pend-bg: #4a3d17; --b-pend: #f0cf7a; --b-pago-bg: #1f4a33; --b-pago: #9fe0b8; --b-env-bg: #213c7c; --b-env: #b4cdf5;
   --b-ent-bg: #1c5238; --b-ent: #b6ebcb; --b-canc-bg: #5a2530; --b-canc: #f4a8b4;
@@ -14,7 +14,7 @@
   --bg: #e4ebf0; --paper: #ffffff; --ink: #181848; --muted: #55697f; --line: #bdd1de;
   --green: #2c6a96; --green-d: #234f73; --terra: #9a6400; --gold: #f0a818; --amarelo: #d9910a;
   --ok: #2d7a4f; --danger: #b3321f; --radius: 10px;
-  --btn: #3a7099; --btn-d: #2c5a80; --surface-2: #e4ebf0; --th-bg: #f1f5f8; --sel: #e8f0f6; --input-bg: #fff;
+  --btn: #3a7099; --btn-d: #2c5a80; --surface-2: #e4ebf0; --chip-bg: #bcd6ea; --th-bg: #f1f5f8; --sel: #e8f0f6; --input-bg: #fff;
   --alert-bg: #fbe9e5; --alert-line: #f0c4bb; --overlay: rgba(24,24,72,.5); --shadow: rgba(24,24,72,.18);
   --b-pend-bg: #f5e8c8; --b-pend: #7a5a14; --b-pago-bg: #d6ead9; --b-pago: #1f5a37; --b-env-bg: #d5e1f0; --b-env: #274a7a;
   --b-ent-bg: #c6e4d4; --b-ent: #14532d; --b-canc-bg: #f3d4cd; --b-canc: #8a2a1a;
@@ -89,7 +89,7 @@ fieldset.multi { border: 1px solid var(--line); border-radius: 8px; display: gri
 .book { display: flex; flex-direction: column; } .book-body { padding: 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .book-title { font: 600 1rem var(--serif); text-decoration: none; color: var(--ink); } .book-foot { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; }
 .price { font: 700 1.05rem var(--serif); color: var(--green); } .price-lg { font-size: 1.6rem; }
-.chips { display: flex; gap: 6px; flex-wrap: wrap; } .chip { background: var(--surface-2); border-radius: 99px; padding: 2px 10px; font-size: .75rem; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; } .chip { background: var(--chip-bg); border: 1px solid var(--line); border-radius: 99px; padding: 2px 10px; font-size: .75rem; }
 .capa { aspect-ratio: 2/3; color: #f6f1e7; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; border-left: 6px solid rgba(0,0,0,.25); }
 .capa-titulo { font: 700 1.05rem var(--serif); } .capa-autor { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
 .capa-img { padding: 0; background: var(--surface-2); border-left: 0; overflow: hidden; }
@@ -138,3 +138,20 @@ body, .card, .modal, .topbar, input, select, textarea { transition: background-c
 .pw { position: relative; display: block; } .pw input { padding-right: 44px; }
 .pw-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--green); cursor: pointer; padding: 6px; border-radius: 6px; display: flex; color: var(--muted); }
 .pw-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+/* detalhe: espaçamento da sinopse e galeria de imagens */
+.sinopse { margin-top: 28px; } .sinopse h3 { margin: 0 0 8px; }
+.detalhe .price-lg { margin: 4px 0 14px; }
+.meta { margin-top: 20px; }
+.warn { color: var(--amarelo); font-weight: 600; margin: 4px 0 18px;}
+.galeria { width: 260px; display: flex; flex-direction: column; gap: 12px; }
+.galeria-mini { display: flex; flex-wrap: wrap; gap: 8px; }
+.mini { width: 48px; height: 64px; padding: 0; border: 2px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--surface-2); cursor: pointer; opacity: .75; }
+.mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mini:hover, .mini-ativa { opacity: 1; border-color: var(--amarelo); }
+.extras { display: flex; flex-wrap: wrap; gap: 10px; }
+.extra { position: relative; width: 64px; }
+.extra img { width: 64px; height: 96px; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); display: block; }
+.extra.removida img { opacity: .3; }
+.extra-x { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; line-height: 1; padding: 0; }
+@media (max-width: 760px) { .galeria { width: 180px; } }

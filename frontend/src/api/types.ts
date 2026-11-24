@@ -15,6 +15,8 @@ export interface Autor { id: number; nome: string; biografia?: string | null; na
 export interface Categoria { id: number; genero: string }
 export interface Editora { id: number; nome: string }
 
+export interface LivroImagem { id: number; url: string }
+
 export interface Livro {
   id: number
   nome: string
@@ -25,11 +27,14 @@ export interface Livro {
   numeroPaginas?: number | null
   idioma?: string | null
   imagemUrl?: string | null
+  imagens: LivroImagem[]
   dataCadastro: string
   editoraId: number
   editoraNome: string
   generos: string[]
   autores: string[]
+  autoresIds: number[]
+  categoriaIds: number[]
   quantidadeEstoque: number
 }
 

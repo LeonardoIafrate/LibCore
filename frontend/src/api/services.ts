@@ -6,6 +6,7 @@ import type {
 
 export const authApi = {
   login: (email: string, senha: string) => http.post<Token>('/api/auth/login', { email, senha }),
+  renovar: () => http.post<Token>('/api/auth/renovar'),
 }
 
 export interface LivroFiltro {
@@ -24,6 +25,12 @@ export const livrosApi = {
     return http.putForm<Livro>(`/api/livros/${id}/imagem`, f)
   },
   removeImagem: (id: number) => http.del<Livro>(`/api/livros/${id}/imagem`),
+  addImagemExtra: (id: number, arquivo: File) => {
+    const f = new FormData()
+    f.append('arquivo', arquivo)
+    return http.postForm<Livro>(`/api/livros/${id}/imagens`, f)
+  },
+  removeImagemExtra: (id: number, imagemId: number) => http.del<Livro>(`/api/livros/${id}/imagens/${imagemId}`),
 }
 
 export const autoresApi = {

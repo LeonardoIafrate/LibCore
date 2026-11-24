@@ -80,6 +80,7 @@ export const http = {
   post: <T>(p: string, body?: unknown) => request<T>('POST', p, { body }),
   put: <T>(p: string, body?: unknown) => request<T>('PUT', p, { body }),
   putForm: <T>(p: string, form: FormData) => request<T>('PUT', p, { body: form }),
+  postForm: <T>(p: string, form: FormData) => request<T>('POST', p, { body: form }),
   patch: <T>(p: string, body?: unknown) => request<T>('PATCH', p, { body }),
   del: <T>(p: string) => request<T>('DELETE', p),
 }

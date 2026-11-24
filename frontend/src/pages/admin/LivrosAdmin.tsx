@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { autoresApi, categoriasApi, editorasApi, livrosApi } from '../../api/services'
 import { ApiError } from '../../api/client'
 import type { Livro, LivroInput } from '../../api/types'
@@ -82,6 +82,28 @@ function LivroForm({ livro, onClose, onDone }: { livro: Livro | null; onClose: (
     setArquivo(f); setRemoverImagem(false)
   }
 
+  const MAX_EXTRAS = 8
+  const existentes = livro?.imagens ?? []
+  const [novas, setNovas] = useState<File[]>([])
+  const [removerIds, setRemoverIds] = useState<number[]>([])
+  const [erroExtras, setErroExtras] = useState('')
+  const previewsNovas = useMemo(() => novas.map(f => URL.createObjectURL(f)), [novas])
+  useEffect(() => () => previewsNovas.forEach(u => URL.revokeObjectURL(u)), [previewsNovas])
+  const totalExtras = existentes.length - removerIds.length + novas.length
+
+  function adicionarExtras(lista: FileList | null) {
+    setErroExtras('')
+    if (!lista) return
+    const aceitas: File[] = []
+    for (const f of Array.from(lista)) {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) { setErroExtras(`“${f.name}”: use JPEG, PNG ou WebP.`); continue }
+      if (f.size > 2 * 1024 * 1024) { setErroExtras(`“${f.name}” passa de 2 MB.`); continue }
+      if (totalExtras + aceitas.length >= MAX_EXTRAS) { setErroExtras(`Cada livro aceita no máximo ${MAX_EXTRAS} imagens adicionais.`); break }
+      aceitas.push(f)
+    }
+    if (aceitas.length) setNovas([...novas, ...aceitas])
+  }
+
   const [erros, setErros] = useState<Record<string, string[]>>({})
   const [erro, setErro] = useState('')
   const [busy, setBusy] = useState(false)
@@ -110,6 +132,12 @@ function LivroForm({ livro, onClose, onDone }: { livro: Livro | null; onClose: (
         else if (removerImagem && livro?.imagemUrl) await livrosApi.removeImagem(salvo.id)
       } catch (x) {
         toast.erro(`Livro salvo, mas a imagem não foi enviada: ${msgErro(x)}`)
+      }
+      try {
+        for (const imagemId of removerIds) await livrosApi.removeImagemExtra(salvo.id, imagemId)
+        for (const f of novas) await livrosApi.addImagemExtra(salvo.id, f)
+      } catch (x) {
+        toast.erro(`Livro salvo, mas nem todas as imagens adicionais foram atualizadas: ${msgErro(x)}`)
       }
       onDone()
     }
@@ -157,6 +185,30 @@ function LivroForm({ livro, onClose, onDone }: { livro: Livro | null; onClose: (
                 )}
               </div>
             </div>
+          </div>
+          <div className="field"><span className="field-label">Imagens adicionais ({totalExtras}/{MAX_EXTRAS})</span>
+            <div className="extras">
+              {existentes.map(i => {
+                const removida = removerIds.includes(i.id)
+                return (
+                  <div key={i.id} className={`extra ${removida ? 'removida' : ''}`}>
+                    <img src={assetUrl(i.url)!} alt="Imagem adicional" />
+                    <button type="button" className="extra-x" aria-label={removida ? 'Desfazer remoção' : 'Remover imagem'}
+                      onClick={() => setRemoverIds(removida ? removerIds.filter(x => x !== i.id) : [...removerIds, i.id])}>{removida ? '↺' : '×'}</button>
+                  </div>
+                )
+              })}
+              {novas.map((f, idx) => (
+                <div key={`${f.name}-${idx}`} className="extra">
+                  <img src={previewsNovas[idx]} alt={`Nova imagem ${f.name}`} />
+                  <button type="button" className="extra-x" aria-label="Descartar imagem" onClick={() => setNovas(novas.filter((_, j) => j !== idx))}>×</button>
+                </div>
+              ))}
+            </div>
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={totalExtras >= MAX_EXTRAS}
+              onChange={e => { adicionarExtras(e.target.files); e.target.value = '' }} aria-label="Imagens adicionais" />
+            <span className="field-hint">Aparecem como miniaturas na página do livro. JPEG, PNG ou WebP, até 2 MB cada. Salvas ao clicar em “Salvar”.</span>
+            {erroExtras && <span className="field-error">{erroExtras}</span>}
           </div>
           <TextArea label="Sinopse" rows={4} maxLength={2000} value={v.sinopse} error={err('Sinopse')} onChange={e => set('sinopse', e.target.value)} />
           {livro && <p className="muted small">O estoque é ajustado na aba “Estoque”.</p>}
