@@ -22,7 +22,7 @@ namespace api.Dtos.Usuario
 
         [Required]
         [MinLength(8, ErrorMessage = "A senha deve conter no mínimo 8 caracteres.")]
-        [MaxLength(100, ErrorMessage = "A senha deve conter no máximo 8 caracteres.")]
+        [MaxLength(100, ErrorMessage = "A senha deve conter no máximo 100 caracteres.")]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).+$", ErrorMessage = "A senha deve conter letras e números.")]
         public string Senha { get; set; } = string.Empty;
 

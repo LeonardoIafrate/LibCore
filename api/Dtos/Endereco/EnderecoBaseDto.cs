@@ -20,7 +20,7 @@ namespace api.Dtos.Endereco
         public string? Complemento { get; set; }
         
         [Required(ErrorMessage = "O bairro é obrigatório.")]
-        [MaxLength(100, ErrorMessage = "O bairro deve conter no máximo 10 caracteres.")]
+        [MaxLength(100, ErrorMessage = "O bairro deve conter no máximo 100 caracteres.")]
         public string Bairro { get; set; } = string.Empty;
         
         [Required(ErrorMessage = "A cidade é obrigatória.")]

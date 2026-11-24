@@ -10,12 +10,12 @@ namespace api.Dtos.Usuario
     public class UpdateUsuarioDto
     {
         [Required]
-        [MaxLength(100, ErrorMessage = "O nome não pode passar de 150 caractéres.")]
+        [MaxLength(100, ErrorMessage = "O nome não pode passar de 100 caractéres.")]
         public string Nome { get; set; } = string.Empty;
         
         [Required]
         [EmailAddress(ErrorMessage = "E-mail inválido.")]
-        [MaxLength(100, ErrorMessage = "O E-mail deve ter no máximo 150 caractéres.")]
+        [MaxLength(100, ErrorMessage = "O E-mail deve ter no máximo 100 caractéres.")]
         public string Email { get; set; } = string.Empty;
 
         [DataNascimento]
