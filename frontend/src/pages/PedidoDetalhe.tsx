@@ -29,7 +29,7 @@ export default function PedidoDetalhe() {
   return (
     <>
       <Link to={ehAdmin ? '/admin/pedidos' : '/pedidos'} className="muted small">← Voltar</Link>
-      <div className="row between wrapr">
+      <div className="row between wrapr pedido-head">
         <h1>Pedido #{p.id} <StatusBadge s={p.status} /></h1>
         {editavel && (
           <div className="row">
@@ -39,17 +39,31 @@ export default function PedidoDetalhe() {
         )}
       </div>
       <p className="muted">Realizado em {dataHoraBr(p.dataPedido)}{ehAdmin && ` · ${p.usuarioNome}`}</p>
-      <div className="card">
-        <table className="tbl">
-          <thead><tr><th>Livro</th><th className="num">Unitário</th><th className="num">Qtd.</th><th className="num">Subtotal</th></tr></thead>
-          <tbody>{p.itens.map(i => (
-            <tr key={i.livroId}><td><Link to={`/livros/${i.livroId}`}>{i.livroNome}</Link></td><td className="num">{brl(i.precoUnitario)}</td>
-              <td className="num">{i.quantidade}</td><td className="num">{brl(i.subtotal ?? i.precoUnitario * i.quantidade)}</td></tr>
-          ))}</tbody>
-          <tfoot><tr><td colSpan={3} className="num"><strong>Total</strong></td><td className="num"><strong>{brl(p.valorTotal)}</strong></td></tr></tfoot>
-        </table>
+      <div className="pedido-grid">
+        <div className="card">
+          <table className="tbl">
+            <thead><tr><th>Livro</th><th className="num">Unitário</th><th className="qtd">Qtd.</th></tr></thead>
+            <tbody>{p.itens.map(i => (
+              <tr key={i.livroId}><td><Link to={`/livros/${i.livroId}`}>{i.livroNome}</Link></td><td className="num">{brl(i.precoUnitario)}</td>
+                <td className="qtd">{i.quantidade}</td></tr>
+            ))}</tbody>
+          </table>
+        </div>
+        <aside className="card pad pedido-resumo">
+          <h3>Resumo do pedido</h3>
+          <ul className="resumo-itens">{p.itens.map(i => (
+            <li key={i.livroId}>
+              <span>{i.livroNome} <span className="muted small">× {i.quantidade}</span></span>
+              <span>{brl(i.subtotal ?? i.precoUnitario * i.quantidade)}</span>
+            </li>
+          ))}</ul>
+          <div className="resumo-total"><span>Total</span><strong className="price">{brl(p.valorTotal)}</strong></div>
+          <div className="resumo-entrega">
+            <h3>Entrega</h3>
+            <p>{p.endereco}</p>
+          </div>
+        </aside>
       </div>
-      <div className="card pad mt"><h3>Entrega</h3><p>{p.endereco}</p></div>
 
       {cancelando && <Confirm titulo="Cancelar pedido" texto="Tem certeza? Esta ação não pode ser desfeita." confirmar="Cancelar pedido" perigo busy={busy} onYes={cancelar} onNo={() => setCancelando(false)} />}
       {trocando && <TrocarEndereco pedidoId={id} onClose={() => setTrocando(false)} onDone={np => { setData(np); setTrocando(false); toast.ok('Endereço atualizado.') }} />}
