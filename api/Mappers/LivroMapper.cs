@@ -21,6 +21,11 @@ namespace api.Mappers
                 NumeroPaginas = livro.NumeroPaginas,
                 Idioma = livro.Idioma,
                 ImagemUrl = livro.ImagemArquivo == null ? null : $"{PastaPublicaDeImagens}/{livro.ImagemArquivo}",
+                Imagens = livro.Imagens
+                    .OrderBy(i => i.Ordem)
+                    .ThenBy(i => i.Id)
+                    .Select(i => new LivroImagemDto { Id = i.Id, Url = $"{PastaPublicaDeImagens}/{i.Arquivo}" })
+                    .ToList(),
                 DataCadastro = livro.DataCadastro,
                 Autores = livro.Autores
                     .Select(a => a.Nome)

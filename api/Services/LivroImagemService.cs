@@ -8,6 +8,7 @@ namespace api.Services
     public class LivroImagemService : ILivroImagemService
     {
         public const long TamanhoMaximo = 2 * 1024 * 1024;
+        public const int MaximoDeImagensAdicionais = 8;
 
         private readonly ILivroRepository _livroRepo;
         private readonly IImagemStorage _storage;
@@ -57,6 +58,67 @@ namespace api.Services
                 _storage.Remover(novo);
                 throw;
             }
+        }
+
+        public async Task<LivroDto> AdicionarGaleriaAsync(int livroId, Stream conteudo, long tamanho, CancellationToken ct = default)
+        {
+            if(tamanho <= 0)
+                throw new BadRequestException("Envie um arquivo de imagem.");
+
+            if(tamanho > TamanhoMaximo)
+                throw new BadRequestException("A imagem deve ter no máximo 2 MB.");
+
+            var existente = await _livroRepo.GetByIdAsync(livroId);
+            if(existente == null)
+                throw new NotFoundException("Livro não encontrado.");
+
+            if(existente.Imagens.Count >= MaximoDeImagensAdicionais)
+                throw new BadRequestException($"Cada livro aceita no máximo {MaximoDeImagensAdicionais} imagens adicionais.");
+
+            using var memoria = new MemoryStream();
+            await conteudo.CopyToAsync(memoria, ct);
+            var bytes = memoria.ToArray();
+
+            if(bytes.Length > TamanhoMaximo)
+                throw new BadRequestException("A imagem deve ter no máximo 2 MB.");
+
+            var extensao = DetectarExtensao(bytes)
+                ?? throw new BadRequestException("Formato inválido. Envie uma imagem JPEG, PNG ou WebP.");
+
+            var arquivo = await _storage.SalvarAsync(bytes, extensao, ct);
+
+            try
+            {
+                var atualizado = await _livroRepo.AdicionarImagemAsync(livroId, arquivo);
+                if(atualizado == null)
+                    throw new NotFoundException("Livro não encontrado.");
+
+                return atualizado.ToLivroDto();
+            }
+            catch
+            {
+                _storage.Remover(arquivo);
+                throw;
+            }
+        }
+
+        public async Task<LivroDto> RemoverDaGaleriaAsync(int livroId, int imagemId)
+        {
+            var existente = await _livroRepo.GetByIdAsync(livroId);
+            if(existente == null)
+                throw new NotFoundException("Livro não encontrado.");
+
+            var imagem = existente.Imagens.FirstOrDefault(i => i.Id == imagemId);
+            if(imagem == null)
+                throw new NotFoundException("Imagem não encontrada.");
+
+            var arquivo = imagem.Arquivo;
+            var atualizado = await _livroRepo.RemoverImagemAsync(livroId, imagemId);
+            if(atualizado == null)
+                throw new NotFoundException("Livro não encontrado.");
+
+            _storage.Remover(arquivo);
+            return atualizado.ToLivroDto();
         }
 
         public async Task<LivroDto> RemoverAsync(int livroId)

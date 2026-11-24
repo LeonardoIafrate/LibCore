@@ -174,6 +174,7 @@ if (!app.Environment.IsEnvironment("Testing"))
             .CreateLogger("CatalogoInicial");
 
         await CatalogoInicial.SemearAsync(dbContext, logger);
+        await CapasIniciais.AplicarAsync(dbContext, app.Environment.ContentRootPath, logger);
     }
 }
 

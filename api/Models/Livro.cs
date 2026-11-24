@@ -21,5 +21,7 @@ namespace api.Models
         public List<Autor> Autores { get; set; } = new();
 
         public Estoque? Estoque { get; set; }
+
+        public List<LivroImagem> Imagens { get; set; } = new();
     }
 }

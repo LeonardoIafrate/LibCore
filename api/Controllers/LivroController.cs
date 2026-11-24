@@ -69,6 +69,23 @@ namespace api.Controllers
             return Ok(atualizado);
         }
 
+        [HttpPost("{id:int}/imagens")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(3 * 1024 * 1024)]
+        public async Task<ActionResult<LivroDto>> AdicionarImagem([FromRoute] int id, IFormFile arquivo, CancellationToken ct)
+        {
+            await using var stream = arquivo.OpenReadStream();
+            var atualizado = await _imagemService.AdicionarGaleriaAsync(id, stream, arquivo.Length, ct);
+            return Ok(atualizado);
+        }
+
+        [HttpDelete("{id:int}/imagens/{imagemId:int}")]
+        public async Task<ActionResult<LivroDto>> RemoverImagemDaGaleria([FromRoute] int id, [FromRoute] int imagemId)
+        {
+            var atualizado = await _imagemService.RemoverDaGaleriaAsync(id, imagemId);
+            return Ok(atualizado);
+        }
+
         [HttpDelete("{id:int}/imagem")]
         public async Task<ActionResult<LivroDto>> RemoverImagem([FromRoute] int id)
         {
@@ -82,6 +99,8 @@ namespace api.Controllers
             var livro = await _livroService.GetByIdAsync(id);
             await _livroService.DeleteAsync(id);
             _imagemService.LimparArquivo(livro.ImagemUrl);
+            foreach(var imagem in livro.Imagens)
+                _imagemService.LimparArquivo(imagem.Url);
             return NoContent();
         }
     }

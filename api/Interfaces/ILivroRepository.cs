@@ -14,6 +14,8 @@ namespace api.Interfaces
         Task<Livro?> UpdateAsync(int id, Livro livroModel);
         Task<Livro?> DeleteAsync(int id);
         Task<Livro?> AtualizarImagemAsync(int id, string? arquivo);
+        Task<Livro?> AdicionarImagemAsync(int id, string arquivo);
+        Task<Livro?> RemoverImagemAsync(int id, int imagemId);
         Task<bool> PossuiPedidosAsync(int id);
         Task<bool> ExistsAsync(int id);
     }

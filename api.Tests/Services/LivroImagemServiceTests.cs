@@ -110,4 +110,74 @@ public class LivroImagemServiceTests
 
         _storage.Received(1).Remover("capa.png");
     }
+
+    private static Livro LivroComGaleria(params (int Id, string Arquivo)[] imagens)
+    {
+        var livro = CriarLivro();
+        foreach(var (id, arquivo) in imagens)
+            livro.Imagens.Add(new LivroImagem { Id = id, LivroId = LivroId, Arquivo = arquivo, Ordem = id });
+        return livro;
+    }
+
+    [Fact]
+    public async Task AdicionarGaleria_ImagemValida_SalvaEDevolveNaLista()
+    {
+        _livroRepo.GetByIdAsync(LivroId).Returns(CriarLivro());
+        _storage.SalvarAsync(Arg.Any<byte[]>(), ".png", Arg.Any<CancellationToken>()).Returns("extra.png");
+        _livroRepo.AdicionarImagemAsync(LivroId, "extra.png").Returns(LivroComGaleria((7, "extra.png")));
+
+        using var stream = new MemoryStream(Png);
+        var resultado = await CriarServico().AdicionarGaleriaAsync(LivroId, stream, Png.Length);
+
+        var imagem = Assert.Single(resultado.Imagens);
+        Assert.Equal(7, imagem.Id);
+        Assert.Equal("/uploads/livros/extra.png", imagem.Url);
+    }
+
+    [Fact]
+    public async Task AdicionarGaleria_NoLimite_LancaBadRequestENaoGrava()
+    {
+        var cheio = LivroComGaleria(Enumerable.Range(1, LivroImagemService.MaximoDeImagensAdicionais)
+            .Select(i => (i, $"img{i}.png")).ToArray());
+        _livroRepo.GetByIdAsync(LivroId).Returns(cheio);
+
+        using var stream = new MemoryStream(Png);
+
+        await Assert.ThrowsAsync<BadRequestException>(
+            () => CriarServico().AdicionarGaleriaAsync(LivroId, stream, Png.Length));
+
+        await _storage.DidNotReceive().SalvarAsync(Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AdicionarGaleria_ConteudoQueNaoEImagem_LancaBadRequest()
+    {
+        _livroRepo.GetByIdAsync(LivroId).Returns(CriarLivro());
+
+        using var stream = new MemoryStream(Texto);
+
+        await Assert.ThrowsAsync<BadRequestException>(
+            () => CriarServico().AdicionarGaleriaAsync(LivroId, stream, Texto.Length));
+    }
+
+    [Fact]
+    public async Task RemoverDaGaleria_RemoveRegistroEArquivo()
+    {
+        _livroRepo.GetByIdAsync(LivroId).Returns(LivroComGaleria((3, "extra.png")));
+        _livroRepo.RemoverImagemAsync(LivroId, 3).Returns(CriarLivro());
+
+        var resultado = await CriarServico().RemoverDaGaleriaAsync(LivroId, 3);
+
+        Assert.Empty(resultado.Imagens);
+        _storage.Received(1).Remover("extra.png");
+    }
+
+    [Fact]
+    public async Task RemoverDaGaleria_ImagemInexistente_LancaNotFound()
+    {
+        _livroRepo.GetByIdAsync(LivroId).Returns(CriarLivro());
+
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => CriarServico().RemoverDaGaleriaAsync(LivroId, 99));
+    }
 }

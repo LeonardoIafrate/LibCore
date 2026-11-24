@@ -11,6 +11,9 @@ namespace api.Dtos.Livro
         public int? NumeroPaginas { get; set; }
         public string? Idioma { get; set; }
         public string? ImagemUrl { get; set; }
+
+        /// <summary>Imagens adicionais (galeria), além da capa.</summary>
+        public List<LivroImagemDto> Imagens { get; set; } = new();
         public DateTime DataCadastro { get; set; }
 
         public int EditoraId { get; set; }
