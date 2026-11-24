@@ -39,9 +39,12 @@ namespace api.Data
                     : autores[nome] = new Autor { Nome = nome, Nacionalidade = nacionalidade, Biografia = biografia };
 
 
-            var aurora = ObterEditora("Editora Aurora");
-            var horizonte = ObterEditora("Editora Horizonte");
-            var cais = ObterEditora("Editora Cais");
+            var principis = ObterEditora("Editora Principis");
+            var companhia = ObterEditora("Editora Companhia das Letrinhas");
+            var panda = ObterEditora("Editora Panda Books");
+            var record = ObterEditora("Editora Record");
+            var martin = ObterEditora("Editora Martin Claret");
+            var via = ObterEditora("Editora Via Leitura");
 
 
             var romance = ObterCategoria("Romance");
@@ -95,67 +98,67 @@ namespace api.Data
 
             var livros = new List<Livro>
             {
-                NovoLivro(1, "Dom Casmurro", machado, aurora, 1899, 39.90m, 256,
+                NovoLivro(1, "Dom Casmurro", machado, principis, 1899, 39.90m, 256,
                     "Bentinho, já maduro, revive a juventude e o grande amor por Capitu enquanto tenta responder a uma " +
                     "pergunta que o corrói: teria sido traído?",
                     estoque: 25, romance, classico, brasileira),
 
-                NovoLivro(2, "Memórias Póstumas de Brás Cubas", machado, aurora, 1881, 29.90m, 240,
+                NovoLivro(2, "Memórias Póstumas de Brás Cubas", machado, via, 1881, 29.90m, 240,
                     "O defunto-autor Brás Cubas conta a própria vida com ironia e sem pressa, de além-túmulo, " +
                     "expondo as vaidades e as pequenezas da sociedade do seu tempo.",
                     estoque: 18, romance, classico, brasileira, realismo),
 
-                NovoLivro(3, "Quincas Borba", machado, aurora, 1891, 34.90m, 280,
+                NovoLivro(3, "Quincas Borba", machado, principis, 1891, 34.90m, 280,
                     "Rubião herda uma fortuna e a filosofia excêntrica do Humanitismo, e vê o dinheiro e a " +
                     "ingenuidade o levarem à ruína no Rio de Janeiro.",
                     estoque: 12, romance, classico, brasileira, realismo),
 
-                NovoLivro(4, "O Cortiço", aluisio, horizonte, 1890, 32.90m, 288,
+                NovoLivro(4, "O Cortiço", aluisio, panda, 1890, 32.90m, 288,
                     "Num cortiço do Rio de Janeiro, a ambição de um comerciante português e a vida coletiva dos " +
                     "moradores mostram o lado cru da sociedade urbana do século XIX.",
                     estoque: 20, romance, classico, brasileira, realismo),
 
-                NovoLivro(5, "Iracema", alencar, horizonte, 1865, 24.90m, 160,
+                NovoLivro(5, "Iracema", alencar, principis, 1865, 24.90m, 160,
                     "A jovem tabajara Iracema e o guerreiro português Martim vivem um amor impossível que, na " +
                     "leitura de Alencar, simboliza o nascimento do povo brasileiro.",
                     estoque: 30, romance, classico, brasileira, romantismo),
 
-                NovoLivro(6, "O Guarani", alencar, horizonte, 1857, 36.90m, 352,
+                NovoLivro(6, "O Guarani", alencar, principis, 1857, 36.90m, 352,
                     "No Brasil colonial, o índio Peri dedica a vida a proteger Ceci, filha de um fidalgo português, " +
                     "numa aventura de lealdade e amor impossível.",
                     estoque: 8, romance, classico, brasileira, romantismo, aventura),
 
-                NovoLivro(7, "Triste Fim de Policarpo Quaresma", lima, cais, 1915, 37.90m, 296,
+                NovoLivro(7, "Triste Fim de Policarpo Quaresma", lima, martin, 1915, 37.90m, 296,
                     "Patriota fervoroso, o major Policarpo tenta transformar o Brasil com ideias grandiosas e acaba " +
                     "colidindo com a política e a burocracia reais.",
                     estoque: 15, romance, classico, brasileira),
 
-                NovoLivro(8, "Vidas Secas", graciliano, cais, 1938, 29.90m, 176,
+                NovoLivro(8, "Vidas Secas", graciliano, record, 1938, 29.90m, 176,
                     "Fabiano, Sinhá Vitória e os filhos fogem da seca do sertão nordestino numa travessia marcada " +
                     "pela miséria, pelo silêncio e pela dignidade.",
                     estoque: 0, romance, classico, brasileira),
 
-                NovoLivro(9, "O Primo Basílio", eca, cais, 1878, 44.90m, 432,
+                NovoLivro(9, "O Primo Basílio", eca, principis, 1878, 44.90m, 432,
                     "Luísa, entediada com a vida doméstica em Lisboa, reencontra o primo Basílio e se vê envolvida " +
                     "num adultério que lhe custará caro.",
                     estoque: 6, romance, classico, portuguesa, realismo),
 
-                NovoLivro(10, "Dom Quixote", cervantes, aurora, 1605, 79.90m, 960,
+                NovoLivro(10, "Dom Quixote", cervantes, principis, 1605, 79.90m, 960,
                     "Um fidalgo enlouquecido pelos livros de cavalaria sai pelo mundo como cavaleiro andante, ao " +
                     "lado do fiel Sancho Pança, confundindo moinhos com gigantes.",
                     estoque: 10, romance, classico, aventura),
 
-                NovoLivro(11, "Reinações de Narizinho", lobato, horizonte, 1931, 42.90m, 224,
+                NovoLivro(11, "Reinações de Narizinho", lobato, companhia, 1931, 42.90m, 224,
                     "Narizinho, a boneca Emília e os moradores do Sítio do Picapau Amarelo vivem aventuras que " +
                     "misturam o cotidiano da fazenda e a fantasia.",
                     estoque: 22, infantil, brasileira, aventura),
 
-                NovoLivro(12, "Memórias de um Sargento de Milícias", almeida, cais, 1854, 27.90m, 224,
+                NovoLivro(12, "Memórias de um Sargento de Milícias", almeida, principis, 1854, 27.90m, 224,
                     "As peripécias do malandro Leonardo no Rio de Janeiro do tempo do rei D. João VI, entre amores, " +
                     "trapaças e a perseguição do major Vidigal.",
                     estoque: 3, romance, classico, brasileira, romantismo),
 
-                NovoLivro(13, "A Moreninha", macedo, aurora, 1844, 22.90m, 176,
+                NovoLivro(13, "A Moreninha", macedo, principis, 1844, 22.90m, 176,
                     "Durante um feriado numa ilha, o estudante Augusto aposta que nunca se apaixonará e se vê às " +
                     "voltas com a encantadora Carolina.",
                     estoque: 14, romance, classico, brasileira, romantismo)

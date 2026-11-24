@@ -28,7 +28,7 @@ namespace api.Tests.Banco
             Assert.Equal(13, await conferencia.Set<Livro>().CountAsync());
             Assert.Equal(10, await conferencia.Set<Autor>().CountAsync());
             Assert.Equal(8, await conferencia.Set<Categoria>().CountAsync());
-            Assert.Equal(3, await conferencia.Set<Editora>().CountAsync());
+            Assert.Equal(6, await conferencia.Set<Editora>().CountAsync());
         }
 
         [Fact]
@@ -97,18 +97,18 @@ namespace api.Tests.Banco
         public async Task Semear_ReaproveitaUmaEditoraQueJaExiste()
         {
             await using var contexto = await _fixture.CriarBancoLimpoAsync();
-            contexto.Set<Editora>().Add(new Editora { Nome = "Editora Aurora" });
+            contexto.Set<Editora>().Add(new Editora { Nome = "Editora Principis" });
             await contexto.SaveChangesAsync();
 
             await using var outro = _fixture.NovoContextoDoMesmoBanco(contexto);
             await SemearAsync(outro);
 
             await using var conferencia = _fixture.NovoContextoDoMesmoBanco(contexto);
-            Assert.Equal(3, await conferencia.Set<Editora>().CountAsync());
+            Assert.Equal(6, await conferencia.Set<Editora>().CountAsync());
 
-            var aurora = await conferencia.Set<Editora>().Include(e => e.Livros)
-                .SingleAsync(e => e.Nome == "Editora Aurora");
-            Assert.Equal(5, aurora.Livros.Count);
+            var principis = await conferencia.Set<Editora>().Include(e => e.Livros)
+                .SingleAsync(e => e.Nome == "Editora Principis");
+            Assert.Equal(8, principis.Livros.Count);
         }
     }
 }
