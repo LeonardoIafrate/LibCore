@@ -20,6 +20,9 @@ namespace api.Dtos.Livro
 
         public List<string> Autores { get; set; } = new();
 
+        public List<int> AutoresIds { get; set; } = new();
+        public List<int> CategoriaIds { get; set; } = new();
+
         public int QuantidadeEstoque { get; set; }
     }
 }

@@ -26,6 +26,14 @@ namespace api.Mappers
                     .Select(a => a.Nome)
                     .OrderBy(n => n)
                     .ToList(),
+                AutoresIds = livro.Autores
+                    .OrderBy(a => a.Nome)
+                    .Select(a => a.Id)
+                    .ToList(),
+                CategoriaIds = livro.Categorias
+                    .OrderBy(c => c.Genero)
+                    .Select(c => c.Id)
+                    .ToList(),
                 EditoraId = livro.EditoraId,
                 EditoraNome = livro.Editora?.Nome?? string.Empty,
                 Generos = livro.Categorias
