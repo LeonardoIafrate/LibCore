@@ -13,6 +13,7 @@ API REST em ASP.NET Core para gerenciar usuários, livros e pedidos de uma livra
 - xUnit, NSubstitute e Testcontainers (testes com SQL Server real)
 - Docker e Docker Compose
 - Git e GitHub Actions
+- React, TypeScript e Vite (front-end)
 
 ## Funcionalidades
 
@@ -27,7 +28,8 @@ API REST em ASP.NET Core para gerenciar usuários, livros e pedidos de uma livra
 - ✅ CORS configurável por ambiente
 - ✅ Health checks (`/health/live` e `/health/ready`)
 - ✅ Testes unitários e de integração executados no GitHub Actions
-- [ ] Front-end em React consumindo a API
+- ✅ Front-end em React consumindo a API (catálogo, carrinho, pedidos e painel de administração)
+- ✅ Capas dos livros enviadas pelo painel de administração
 
 ## Arquitetura
 
@@ -76,6 +78,23 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<sua connection s
 dotnet run
 ```
 
+### Front-end (React)
+
+Com a API em execução:
+
+```bash
+cd frontend
+cp .env.example .env      # no PowerShell: copy .env.example .env
+npm install
+npm run dev
+```
+
+- Acesse http://localhost:5173. Em Development a API só libera CORS para as portas 5173 e 3000 (`Cors:Origens`).
+- No `.env` do front-end, `VITE_API_URL` aponta para a API: `http://localhost:8080` (Docker Compose) ou `http://localhost:5279` (`dotnet run`).
+- Para entrar no painel de administração (`/admin`), use o administrador definido em `BOOTSTRAP_ADMIN_*` no `.env` da API.
+- As capas enviadas ficam no volume `uploads_data` do Docker Compose (ou em `api/wwwroot/uploads` sem Docker).
+- O Vite não funciona se o caminho do projeto tiver `#` (por exemplo uma pasta `C#`). Mantenha o projeto em um caminho sem esse caractere.
+
 ## Testes
 
 ```bash
@@ -120,6 +139,5 @@ Listagens paginadas aceitam `?pagina=1&tamanhoPagina=10` (máximo de 50 por pág
 
 ## Próximos passos
 
-- Front-end em React consumindo a API
 - Refresh token
 - Paginação em mais listagens, se o volume de dados justificar
