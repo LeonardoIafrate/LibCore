@@ -37,7 +37,7 @@ export default function LivroDetalhe() {
           <div className="row">
             <input type="number" className="qty" min={1} max={max} value={q} onChange={e => setQ(Math.max(1, Math.min(max, Number(e.target.value) || 1)))} aria-label="Quantidade" />
             <button className="btn btn-primary" onClick={() => { adicionar(l, q); toast.ok('Adicionado ao carrinho.') }}>Adicionar ao carrinho</button>
-            <button className="btn btn-ghost" onClick={() => { adicionar(l, q); nav('/carrinho') }}>Comprar agora</button>
+            <button className="btn btn-buy" onClick={() => { adicionar(l, q); nav('/carrinho') }}>Comprar agora</button>
           </div>
         )}
         {l.sinopse && <section className="sinopse"><h3>Sinopse</h3><p className="prose">{l.sinopse}</p></section>}
