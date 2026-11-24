@@ -68,5 +68,15 @@ namespace api.Services
 
             return _tokenService.GerarToken(usuario);
         }
+
+        public async Task<TokenDto> RenovarAsync(int usuarioId)
+        {
+            var usuario = await _usuarioRepo.GetByIdAsync(usuarioId);
+
+            if(usuario == null || !usuario.Ativo)
+                throw new UnauthorizedException("Sessão inválida.");
+
+            return _tokenService.GerarToken(usuario);
+        }
     }
 }

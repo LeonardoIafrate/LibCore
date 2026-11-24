@@ -55,6 +55,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t)
   }, [sessao, logout])
 
+  // ao abrir/recarregar a página, pede um token novo para refletir mudanças de perfil (ex.: virou admin)
+  const logado = sessao !== null
+  useEffect(() => {
+    if (!logado) return
+    let cancelado = false
+    authApi.renovar().then(({ token }) => {
+      const s = decodificar(token)
+      if (cancelado || !s) return
+      tokenStore.set(token)
+      setSessao(atual => (atual && atual.id === s.id ? s : atual))
+    }).catch(() => { /* 401 já desloga pelo listener; falha de rede mantém a sessão atual */ })
+    return () => { cancelado = true }
+  }, [logado])
+
   const login = useCallback(async (email: string, senha: string) => {
     const { token } = await authApi.login(email, senha)
     const s = decodificar(token)
