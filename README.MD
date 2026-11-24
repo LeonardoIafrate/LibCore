@@ -1,6 +1,6 @@
 # LibCore
 
-![CI](https://github.com/LeonardoIafrate/LibCore/actions/workflows/ci.yml)
+[![CI](https://github.com/LeonardoIafrate/Livraria/actions/workflows/ci.yml/badge.svg)](https://github.com/LeonardoIafrate/Livraria/actions/workflows/ci.yml)
 
 API REST em ASP.NET Core para gerenciar usuários, livros e pedidos de uma livraria. O objetivo do projeto é aplicar conceitos de desenvolvimento back-end: arquitetura em camadas, persistência de dados, autenticação, migrations e testes automatizados.
 
@@ -64,6 +64,7 @@ cp .env.example .env      # preencha os valores
 docker compose up --build
 ```
 
+- Loja (front-end): http://localhost:5173
 - Swagger: http://localhost:8080/swagger
 - Health check: http://localhost:8080/health/ready
 
@@ -80,7 +81,7 @@ dotnet run
 
 ### Front-end (React)
 
-Com a API em execução:
+O `docker compose up --build` já sobe o front-end junto (http://localhost:5173). Para desenvolver com recarga automática, rode-o à parte com a API em execução:
 
 ```bash
 cd frontend
