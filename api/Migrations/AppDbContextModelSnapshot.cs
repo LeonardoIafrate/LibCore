@@ -271,6 +271,10 @@ namespace api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("ImagemArquivo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Isbn")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -307,6 +311,32 @@ namespace api.Migrations
 
                             t.HasCheckConstraint("CK_Livro_Preco", "[Preco] > 0");
                         });
+                });
+
+            modelBuilder.Entity("api.Models.LivroImagem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Arquivo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("LivroId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LivroId");
+
+                    b.ToTable("LivroImagem", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.Pedido", b =>
@@ -485,6 +515,17 @@ namespace api.Migrations
                     b.Navigation("Editora");
                 });
 
+            modelBuilder.Entity("api.Models.LivroImagem", b =>
+                {
+                    b.HasOne("api.Models.Livro", "Livro")
+                        .WithMany("Imagens")
+                        .HasForeignKey("LivroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Livro");
+                });
+
             modelBuilder.Entity("api.Models.Pedido", b =>
                 {
                     b.HasOne("api.Models.Usuario", "Usuario")
@@ -554,6 +595,8 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Livro", b =>
                 {
                     b.Navigation("Estoque");
+
+                    b.Navigation("Imagens");
                 });
 
             modelBuilder.Entity("api.Models.Pedido", b =>

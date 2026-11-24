@@ -214,4 +214,33 @@ public class AuthServiceTests
         Assert.Equal(TokenDeTeste, resultado.Token);
         await AssertGravacoesAsync(0);
     }
+
+    [Fact]
+    public async Task Renovar_UsuarioAtivo_DevolveTokenNovo()
+    {
+        var usuario = CriarUsuario();
+        _usuarioRepo.GetByIdAsync(usuario.Id).Returns(usuario);
+        _tokenService.GerarToken(usuario).Returns(new TokenDto { Token = TokenDeTeste });
+
+        var resultado = await CriarServico().RenovarAsync(usuario.Id);
+
+        Assert.Equal(TokenDeTeste, resultado.Token);
+    }
+
+    [Fact]
+    public async Task Renovar_UsuarioInativo_LancaUnauthorized()
+    {
+        var usuario = CriarUsuario(ativo: false);
+        _usuarioRepo.GetByIdAsync(usuario.Id).Returns(usuario);
+
+        await Assert.ThrowsAsync<UnauthorizedException>(() => CriarServico().RenovarAsync(usuario.Id));
+    }
+
+    [Fact]
+    public async Task Renovar_UsuarioInexistente_LancaUnauthorized()
+    {
+        _usuarioRepo.GetByIdAsync(99).Returns((Usuario?)null);
+
+        await Assert.ThrowsAsync<UnauthorizedException>(() => CriarServico().RenovarAsync(99));
+    }
 }

@@ -10,6 +10,7 @@ namespace api.Models
         public decimal Preco { get; set; }
         public int? NumeroPaginas { get; set; }
         public string? Idioma { get; set; }
+        public string? ImagemArquivo { get; set; }
         public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
 
         public int EditoraId { get; set; }
@@ -20,5 +21,7 @@ namespace api.Models
         public List<Autor> Autores { get; set; } = new();
 
         public Estoque? Estoque { get; set; }
+
+        public List<LivroImagem> Imagens { get; set; } = new();
     }
 }

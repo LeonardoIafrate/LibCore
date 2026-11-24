@@ -6,6 +6,8 @@ namespace api.Mappers
 {
     public static class LivroMapper
     {
+        public const string PastaPublicaDeImagens = "/uploads/livros";
+
         public static LivroDto ToLivroDto(this Livro livro)
         {
             return new LivroDto
@@ -18,10 +20,24 @@ namespace api.Mappers
                 Preco = livro.Preco,
                 NumeroPaginas = livro.NumeroPaginas,
                 Idioma = livro.Idioma,
+                ImagemUrl = livro.ImagemArquivo == null ? null : $"{PastaPublicaDeImagens}/{livro.ImagemArquivo}",
+                Imagens = livro.Imagens
+                    .OrderBy(i => i.Ordem)
+                    .ThenBy(i => i.Id)
+                    .Select(i => new LivroImagemDto { Id = i.Id, Url = $"{PastaPublicaDeImagens}/{i.Arquivo}" })
+                    .ToList(),
                 DataCadastro = livro.DataCadastro,
                 Autores = livro.Autores
                     .Select(a => a.Nome)
                     .OrderBy(n => n)
+                    .ToList(),
+                AutoresIds = livro.Autores
+                    .OrderBy(a => a.Nome)
+                    .Select(a => a.Id)
+                    .ToList(),
+                CategoriaIds = livro.Categorias
+                    .OrderBy(c => c.Genero)
+                    .Select(c => c.Id)
                     .ToList(),
                 EditoraId = livro.EditoraId,
                 EditoraNome = livro.Editora?.Nome?? string.Empty,

@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# capas de livros enviadas em tempo de execução
+api/wwwroot/uploads/
+
 # User-specific files
 *.rsuser
 *.suo

@@ -50,6 +50,8 @@ builder.Services.AddScoped<IEnderecoRepository, EnderecoRepository>();
 builder.Services.AddScoped<IEnderecoService, EnderecoService>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddSingleton<IImagemStorage, ImagemStorage>();
+builder.Services.AddScoped<ILivroImagemService, LivroImagemService>();
 
 builder.Services.AddScoped<DbInitializer>();
 
@@ -172,10 +174,26 @@ if (!app.Environment.IsEnvironment("Testing"))
             .CreateLogger("CatalogoInicial");
 
         await CatalogoInicial.SemearAsync(dbContext, logger);
+        await CapasIniciais.AplicarAsync(dbContext, app.Environment.ContentRootPath, logger);
     }
 }
 
 app.UseCors("Frontend");
+
+// Capas dos livros enviadas pelo painel de administração.
+var pastaDeCapas = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "uploads", "livros");
+Directory.CreateDirectory(pastaDeCapas);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(pastaDeCapas),
+    RequestPath = "/uploads/livros",
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers["Cache-Control"] = "public,max-age=86400";
+        ctx.Context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    }
+});
 app.UseExceptionHandler();
 
 app.UseExceptionHandler();

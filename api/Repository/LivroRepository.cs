@@ -22,6 +22,7 @@ namespace api.Repository
                                          .Include(l => l.Editora)
                                          .Include(l => l.Categorias)
                                          .Include(l => l.Estoque)
+                                         .Include(l => l.Imagens)
                                          .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Nome))
@@ -64,6 +65,7 @@ namespace api.Repository
                                     .Include(l => l.Editora)
                                     .Include(l => l.Categorias)
                                     .Include(l => l.Estoque)
+                                    .Include(l => l.Imagens)
                                     .FirstOrDefaultAsync(l => l.Id == id);
         }
 
@@ -79,6 +81,7 @@ namespace api.Repository
                                    .Include(l => l.Editora)
                                    .Include(l => l.Categorias)
                                    .Include(l => l.Estoque)
+                                   .Include(l => l.Imagens)
                                    .FirstOrDefaultAsync(l => l.Isbn == isbn);
         }
 
@@ -92,6 +95,7 @@ namespace api.Repository
                    .Include(l => l.Editora)
                    .Include(l => l.Categorias)
                    .Include(l => l.Estoque)
+                   .Include(l => l.Imagens)
                    .Where(l => l.Nome.Contains(termo))
                    .OrderBy(l => l.Nome)
                    .ToListAsync();
@@ -108,7 +112,7 @@ namespace api.Repository
 
         public async Task<Livro?> UpdateAsync(int id, Livro livroModel)
         {
-            var livroExistente = await _dbContext.Livro.Include(l => l.Autores).Include(l => l.Categorias).FirstOrDefaultAsync(l => l.Id == id);
+            var livroExistente = await _dbContext.Livro.Include(l => l.Autores).Include(l => l.Categorias).Include(l => l.Imagens).FirstOrDefaultAsync(l => l.Id == id);
 
             if(livroExistente == null)
                 return null;
@@ -134,6 +138,66 @@ namespace api.Repository
             await _dbContext.Entry(livroExistente).Reference(l => l.Editora).LoadAsync();
             return livroExistente;
             
+        }
+
+        public async Task<Livro?> AtualizarImagemAsync(int id, string? arquivo)
+        {
+            var livro = await _dbContext.Livro
+                                        .Include(l => l.Autores)
+                                        .Include(l => l.Editora)
+                                        .Include(l => l.Categorias)
+                                        .Include(l => l.Estoque)
+                                        .Include(l => l.Imagens)
+                                        .FirstOrDefaultAsync(l => l.Id == id);
+
+            if(livro == null)
+                return null;
+
+            livro.ImagemArquivo = arquivo;
+            await _dbContext.SaveChangesAsync();
+            return livro;
+        }
+
+        public async Task<Livro?> AdicionarImagemAsync(int id, string arquivo)
+        {
+            var livro = await _dbContext.Livro
+                                        .Include(l => l.Autores)
+                                        .Include(l => l.Editora)
+                                        .Include(l => l.Categorias)
+                                        .Include(l => l.Estoque)
+                                        .Include(l => l.Imagens)
+                                        .FirstOrDefaultAsync(l => l.Id == id);
+
+            if(livro == null)
+                return null;
+
+            var proximaOrdem = livro.Imagens.Count == 0 ? 1 : livro.Imagens.Max(i => i.Ordem) + 1;
+            livro.Imagens.Add(new LivroImagem { Arquivo = arquivo, Ordem = proximaOrdem });
+            await _dbContext.SaveChangesAsync();
+            return livro;
+        }
+
+        public async Task<Livro?> RemoverImagemAsync(int id, int imagemId)
+        {
+            var livro = await _dbContext.Livro
+                                        .Include(l => l.Autores)
+                                        .Include(l => l.Editora)
+                                        .Include(l => l.Categorias)
+                                        .Include(l => l.Estoque)
+                                        .Include(l => l.Imagens)
+                                        .FirstOrDefaultAsync(l => l.Id == id);
+
+            if(livro == null)
+                return null;
+
+            var imagem = livro.Imagens.FirstOrDefault(i => i.Id == imagemId);
+            if(imagem != null)
+            {
+                _dbContext.Set<LivroImagem>().Remove(imagem);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return livro;
         }
 
         public async Task<Livro?> DeleteAsync(int id)

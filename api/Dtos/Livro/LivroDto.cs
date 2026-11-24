@@ -10,6 +10,10 @@ namespace api.Dtos.Livro
         public decimal Preco { get; set; }
         public int? NumeroPaginas { get; set; }
         public string? Idioma { get; set; }
+        public string? ImagemUrl { get; set; }
+
+        /// <summary>Imagens adicionais (galeria), além da capa.</summary>
+        public List<LivroImagemDto> Imagens { get; set; } = new();
         public DateTime DataCadastro { get; set; }
 
         public int EditoraId { get; set; }
@@ -18,6 +22,9 @@ namespace api.Dtos.Livro
         public List<string> Generos { get; set; } = new();
 
         public List<string> Autores { get; set; } = new();
+
+        public List<int> AutoresIds { get; set; } = new();
+        public List<int> CategoriaIds { get; set; } = new();
 
         public int QuantidadeEstoque { get; set; }
     }
