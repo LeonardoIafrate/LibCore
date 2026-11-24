@@ -35,6 +35,9 @@ namespace api.Data.Configurations
 
             builder.Property(l => l.Idioma)
                    .HasMaxLength(50);
+
+            builder.Property(l => l.ImagemArquivo)
+                   .HasMaxLength(100);
             
             builder.HasOne(l => l.Editora)
                    .WithMany(e => e.Livros)

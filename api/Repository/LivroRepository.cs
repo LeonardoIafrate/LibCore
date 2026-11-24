@@ -136,6 +136,23 @@ namespace api.Repository
             
         }
 
+        public async Task<Livro?> AtualizarImagemAsync(int id, string? arquivo)
+        {
+            var livro = await _dbContext.Livro
+                                        .Include(l => l.Autores)
+                                        .Include(l => l.Editora)
+                                        .Include(l => l.Categorias)
+                                        .Include(l => l.Estoque)
+                                        .FirstOrDefaultAsync(l => l.Id == id);
+
+            if(livro == null)
+                return null;
+
+            livro.ImagemArquivo = arquivo;
+            await _dbContext.SaveChangesAsync();
+            return livro;
+        }
+
         public async Task<Livro?> DeleteAsync(int id)
         {
             var livroModel = await _dbContext.Livro.FirstOrDefaultAsync(l => l.Id == id);

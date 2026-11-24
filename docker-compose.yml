@@ -2,7 +2,7 @@ services:
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: libcore-db
+    container_name: libcore-db-test
 
     environment: 
       ACCEPT_EULA: "Y"
@@ -31,7 +31,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
 
-    container_name: libcore-api
+    container_name: libcore-api-test
 
     ports:
       - "8080:8080"
@@ -53,6 +53,9 @@ services:
       BootstrapAdmin__Cpf: ${BOOTSTRAP_ADMIN_CPF:?Defina BOOTSTRAP_ADMIN_CPF no .env}
       BootstrapAdmin__Password: ${BOOTSTRAP_ADMIN_PASSWORD:?Defina BOOTSTRAP_ADMIN_PASSWORD no .env}
 
+    volumes:
+      - uploads_data:/app/wwwroot/uploads
+
     depends_on:
       db:
         condition: service_healthy
@@ -61,3 +64,4 @@ services:
 
 volumes:
   sqlserver_data:
+  uploads_data:

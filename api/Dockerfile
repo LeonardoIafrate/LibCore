@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 
 COPY --from=build /app/publish .
 
+RUN mkdir -p /app/wwwroot/uploads/livros
+
 EXPOSE 8080
 
 ENV ASPNETCORE_HTTP_PORTS=8080

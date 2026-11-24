@@ -10,6 +10,7 @@ namespace api.Dtos.Livro
         public decimal Preco { get; set; }
         public int? NumeroPaginas { get; set; }
         public string? Idioma { get; set; }
+        public string? ImagemUrl { get; set; }
         public DateTime DataCadastro { get; set; }
 
         public int EditoraId { get; set; }

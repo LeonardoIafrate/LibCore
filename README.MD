@@ -100,6 +100,8 @@ Os testes de integração e de banco usam Testcontainers, então o **Docker prec
 | Endereços | `/api/enderecos` (CRUD e endereço principal) | Autenticado (apenas do próprio usuário) |
 | Livros, autores, categorias e editoras | `GET` | Público |
 | | `POST`, `PUT`, `DELETE` | Admin |
+| Capa do livro | `PUT /api/livros/{id}/imagem` (multipart, campo `arquivo`; JPEG, PNG ou WebP até 2 MB), `DELETE /api/livros/{id}/imagem` | Admin |
+| | `GET /uploads/livros/{arquivo}` | Público |
 | Estoque | `/api/estoques` | Admin |
 | Pedidos | `POST /api/pedidos`, `GET /api/pedidos/meus-pedidos`, `GET /api/pedidos/{id}`, `PATCH .../cancelar`, `PATCH .../endereco` | Autenticado |
 | | `GET /api/pedidos`, `PATCH /api/pedidos/{id}/status` | Admin |

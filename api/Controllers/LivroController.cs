@@ -13,10 +13,12 @@ namespace api.Controllers
     public class LivroController : ControllerBase
     {
         private readonly ILivroService _livroService;
+        private readonly ILivroImagemService _imagemService;
 
-        public LivroController(ILivroService livroService)
+        public LivroController(ILivroService livroService, ILivroImagemService imagemService)
         {
             _livroService = livroService;
+            _imagemService = imagemService;
         }
 
         [AllowAnonymous]
@@ -57,9 +59,29 @@ namespace api.Controllers
             return Ok(atualizada);
         }
 
-        [HttpDelete("{id:int}")]        public async Task<IActionResult> Delete([FromRoute]int id)
+        [HttpPut("{id:int}/imagem")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(3 * 1024 * 1024)]
+        public async Task<ActionResult<LivroDto>> DefinirImagem([FromRoute] int id, IFormFile arquivo, CancellationToken ct)
         {
+            await using var stream = arquivo.OpenReadStream();
+            var atualizado = await _imagemService.DefinirAsync(id, stream, arquivo.Length, ct);
+            return Ok(atualizado);
+        }
+
+        [HttpDelete("{id:int}/imagem")]
+        public async Task<ActionResult<LivroDto>> RemoverImagem([FromRoute] int id)
+        {
+            var atualizado = await _imagemService.RemoverAsync(id);
+            return Ok(atualizado);
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
+        {
+            var livro = await _livroService.GetByIdAsync(id);
             await _livroService.DeleteAsync(id);
+            _imagemService.LimparArquivo(livro.ImagemUrl);
             return NoContent();
         }
     }

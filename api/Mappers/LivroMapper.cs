@@ -6,6 +6,8 @@ namespace api.Mappers
 {
     public static class LivroMapper
     {
+        public const string PastaPublicaDeImagens = "/uploads/livros";
+
         public static LivroDto ToLivroDto(this Livro livro)
         {
             return new LivroDto
@@ -18,6 +20,7 @@ namespace api.Mappers
                 Preco = livro.Preco,
                 NumeroPaginas = livro.NumeroPaginas,
                 Idioma = livro.Idioma,
+                ImagemUrl = livro.ImagemArquivo == null ? null : $"{PastaPublicaDeImagens}/{livro.ImagemArquivo}",
                 DataCadastro = livro.DataCadastro,
                 Autores = livro.Autores
                     .Select(a => a.Nome)

@@ -13,6 +13,7 @@ namespace api.Interfaces
         Task<Livro> CreateAsync(Livro livroModel);
         Task<Livro?> UpdateAsync(int id, Livro livroModel);
         Task<Livro?> DeleteAsync(int id);
+        Task<Livro?> AtualizarImagemAsync(int id, string? arquivo);
         Task<bool> PossuiPedidosAsync(int id);
         Task<bool> ExistsAsync(int id);
     }
