@@ -21,6 +21,9 @@ namespace api.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(250);
 
+            builder.Property(l => l.Sinopse)
+                   .HasMaxLength(2000);
+
             builder.Property(l => l.Isbn)
                    .IsRequired()
                    .HasMaxLength(20);

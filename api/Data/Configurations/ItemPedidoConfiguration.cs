@@ -10,8 +10,8 @@ namespace api.Data.Configurations
         {
             builder.ToTable("ItemPedido", t =>
             {
-                t.HasCheckConstraint("C_ItemPedido_Quantidade", "[Quantidade] > 0");
-                t.HasCheckConstraint("C_ItemPedido_PrecoUnitario", "[PrecoUnitario] >= 0");
+                t.HasCheckConstraint("CK_ItemPedido_Quantidade", "[Quantidade] > 0");
+                t.HasCheckConstraint("CK_ItemPedido_PrecoUnitario", "[PrecoUnitario] >= 0");
             });
 
             builder.HasKey(i => i.Id);

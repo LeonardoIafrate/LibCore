@@ -244,9 +244,9 @@ namespace api.Migrations
 
                     b.ToTable("ItemPedido", null, t =>
                         {
-                            t.HasCheckConstraint("C_ItemPedido_PrecoUnitario", "[PrecoUnitario] >= 0");
+                            t.HasCheckConstraint("CK_ItemPedido_PrecoUnitario", "[PrecoUnitario] >= 0");
 
-                            t.HasCheckConstraint("C_ItemPedido_Quantidade", "[Quantidade] > 0");
+                            t.HasCheckConstraint("CK_ItemPedido_Quantidade", "[Quantidade] > 0");
                         });
                 });
 
@@ -289,7 +289,8 @@ namespace api.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Sinopse")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("Id");
 
